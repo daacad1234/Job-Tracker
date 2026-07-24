@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9fafb;
+}
+
+/* small helper classes used across pages */
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-5;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+
+.btn-accent {
+  @apply bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors;
+}
+
+.input-field {
+  @apply w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.table-header {
+  @apply bg-slate-800 text-white text-left text-xs font-semibold uppercase tracking-wider px-4 py-3;
+}
+
+.table-cell {
+  @apply px-4 py-3 text-sm text-gray-700 border-b border-gray-100;
+}
