@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: jobboard-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jobboard_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d jobboard_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jobboard-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Spring Boot's relaxed env-var binding maps these straight onto
+      # spring.datasource.* / jwt.secret, overriding application.properties.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/jobboard_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET:-docker_dev_only_secret_change_me_before_any_real_deploy_98765}
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:5174
+    ports:
+      - "8080:8081"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: jobboard-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  pgdata:

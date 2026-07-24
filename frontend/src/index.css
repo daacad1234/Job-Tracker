@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #17202b;
+  --color-ink-soft: #3c4859;
+  --color-paper: #eef1f3;
+  --color-card: #ffffff;
+  --color-primary: #2c4a52;
+  --color-primary-light: #3c6470;
+  --color-accent: #e29d3f;
+  --color-accent-soft: #f6e2c2;
+  --color-danger: #c53434;
+  --color-success: #2f7d4f;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(23, 32, 43, 0.06) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Pinned-notice card treatment: the signature element of the board */
+.pin-card {
+  position: relative;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.pin-card::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 22px;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25);
+  border: 2px solid #fff;
+}
+
+.pin-card:hover {
+  transform: translateY(-3px) rotate(-0.3deg);
+  box-shadow: 0 12px 24px -8px rgba(23, 32, 43, 0.25);
+}
+
+/* Rubber-stamp status badge */
+.stamp {
+  display: inline-block;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+::selection {
+  background: var(--color-accent-soft);
+}

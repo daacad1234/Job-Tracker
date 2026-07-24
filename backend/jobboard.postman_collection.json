@@ -1,0 +1,199 @@
+{
+  "info": {
+    "name": "Job Vacancy Board API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "employerToken", "value": "" },
+    { "key": "applicantToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "companyId", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "jobId", "value": "" },
+    { "key": "applicationId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Employer",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var data = pm.response.json();",
+            "pm.collectionVariables.set('employerToken', data.token);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Acme Employer\",\n  \"email\": \"employer@acme.com\",\n  \"password\": \"password123\",\n  \"role\": \"EMPLOYER\"\n}" }
+          }
+        },
+        {
+          "name": "Register Applicant",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var data = pm.response.json();",
+            "pm.collectionVariables.set('applicantToken', data.token);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Jane Applicant\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"APPLICANT\"\n}" }
+          }
+        },
+        {
+          "name": "Register Admin",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var data = pm.response.json();",
+            "pm.collectionVariables.set('adminToken', data.token);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Site Admin\",\n  \"email\": \"admin@jobboard.com\",\n  \"password\": \"password123\",\n  \"role\": \"ADMIN\"\n}" }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"employer@acme.com\",\n  \"password\": \"password123\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Create Category (admin)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var data = pm.response.json();",
+            "pm.collectionVariables.set('categoryId', data.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/categories",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Software Engineering\"\n}" }
+          }
+        },
+        {
+          "name": "List Categories",
+          "request": { "method": "GET", "url": "{{baseUrl}}/categories" }
+        }
+      ]
+    },
+    {
+      "name": "Companies",
+      "item": [
+        {
+          "name": "Create Company (employer)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var data = pm.response.json();",
+            "pm.collectionVariables.set('companyId', data.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" }
+            ],
+            "url": "{{baseUrl}}/companies",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Acme Corp\",\n  \"description\": \"We build things\",\n  \"website\": \"https://acme.example.com\"\n}" }
+          }
+        },
+        {
+          "name": "List Companies",
+          "request": { "method": "GET", "url": "{{baseUrl}}/companies" }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Create Job (employer)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var data = pm.response.json();",
+            "pm.collectionVariables.set('jobId', data.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" }
+            ],
+            "url": "{{baseUrl}}/jobs",
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Backend Engineer\",\n  \"description\": \"Build and maintain our APIs\",\n  \"requirements\": \"Java, Spring Boot, SQL\",\n  \"location\": \"Remote\",\n  \"employmentType\": \"FULL_TIME\",\n  \"salaryMin\": 60000,\n  \"salaryMax\": 90000,\n  \"deadline\": \"2026-12-31\",\n  \"companyId\": {{companyId}},\n  \"categoryId\": {{categoryId}}\n}" }
+          }
+        },
+        {
+          "name": "Search Jobs (public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/jobs" }
+        },
+        {
+          "name": "Get Job By Id (public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/jobs/{{jobId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Apply to Job (applicant)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var data = pm.response.json();",
+            "pm.collectionVariables.set('applicationId', data.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{applicantToken}}" }
+            ],
+            "url": "{{baseUrl}}/applications",
+            "body": { "mode": "raw", "raw": "{\n  \"jobId\": {{jobId}},\n  \"resumeUrl\": \"https://example.com/resume/jane.pdf\",\n  \"coverLetter\": \"I would love to join Acme!\"\n}" }
+          }
+        },
+        {
+          "name": "My Applications (applicant)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{applicantToken}}" }],
+            "url": "{{baseUrl}}/applications/my"
+          }
+        },
+        {
+          "name": "Applications for Job (employer)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/applications/job/{{jobId}}"
+          }
+        },
+        {
+          "name": "Update Application Status (employer)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" }
+            ],
+            "url": "{{baseUrl}}/applications/{{applicationId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"SHORTLISTED\"\n}" }
+          }
+        }
+      ]
+    }
+  ]
+}
