@@ -16,6 +16,9 @@ const STATUS_LABELS = {
   OFFERED: 'Offered', HIRED: 'Hired', REJECTED: 'Rejected', OPEN: 'Open', CLOSED: 'Closed',
 };
 
+// Must match the backend Job entity's employmentType enum exactly.
+const EMPLOYMENT_TYPES = ['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERNSHIP', 'REMOTE'];
+
 function getStatusIndex(status) {
   const index = PIPELINE_STAGES.indexOf(status);
   return index >= 0 ? index : 0;
@@ -34,15 +37,9 @@ export default function EmployerDashboard() {
 
   const [companyForm, setCompanyForm] = useState({
     name: '',
-    website: '',
     description: '',
-    industry: '',
-    email: '',
-    phone: '',
-    location: '',
+    website: '',
     logoUrl: '',
-    bannerUrl: '',
-    socialLinks: '',
   });
   const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [editingCompanyId, setEditingCompanyId] = useState(null);
@@ -50,14 +47,9 @@ export default function EmployerDashboard() {
   const [jobForm, setJobForm] = useState({
     title: '',
     description: '',
-    responsibilities: '',
     requirements: '',
-    skills: '',
-    benefits: '',
     location: '',
     employmentType: 'FULL_TIME',
-    experienceLevel: 'MID',
-    remoteType: 'ON_SITE',
     salaryMin: '',
     salaryMax: '',
     deadline: '',
@@ -166,15 +158,9 @@ export default function EmployerDashboard() {
   function resetCompanyForm() {
     setCompanyForm({
       name: '',
-      website: '',
       description: '',
-      industry: '',
-      email: '',
-      phone: '',
-      location: '',
+      website: '',
       logoUrl: '',
-      bannerUrl: '',
-      socialLinks: '',
     });
     setEditingCompanyId(null);
   }
@@ -183,14 +169,9 @@ export default function EmployerDashboard() {
     setJobForm({
       title: '',
       description: '',
-      responsibilities: '',
       requirements: '',
-      skills: '',
-      benefits: '',
       location: '',
       employmentType: 'FULL_TIME',
-      experienceLevel: 'MID',
-      remoteType: 'ON_SITE',
       salaryMin: '',
       salaryMax: '',
       deadline: '',
@@ -204,15 +185,9 @@ export default function EmployerDashboard() {
     setEditingCompanyId(company.id);
     setCompanyForm({
       name: company.name || '',
-      website: company.website || '',
       description: company.description || '',
-      industry: company.industry || '',
-      email: company.email || '',
-      phone: company.phone || '',
-      location: company.location || '',
+      website: company.website || '',
       logoUrl: company.logoUrl || '',
-      bannerUrl: company.bannerUrl || '',
-      socialLinks: company.socialLinks || '',
     });
     setShowCompanyForm(true);
   }
@@ -222,16 +197,11 @@ export default function EmployerDashboard() {
     setJobForm({
       title: job.title || '',
       description: job.description || '',
-      responsibilities: job.responsibilities || '',
       requirements: job.requirements || '',
-      skills: job.skills || '',
-      benefits: job.benefits || '',
       location: job.location || '',
       employmentType: job.employmentType || 'FULL_TIME',
-      experienceLevel: job.experienceLevel || 'MID',
-      remoteType: job.remoteType || 'ON_SITE',
-      salaryMin: job.salaryMin || '',
-      salaryMax: job.salaryMax || '',
+      salaryMin: job.salaryMin ?? '',
+      salaryMax: job.salaryMax ?? '',
       deadline: job.deadline || '',
       companyId: job.companyId ? String(job.companyId) : '',
       categoryId: job.categoryId ? String(job.categoryId) : '',
@@ -245,8 +215,10 @@ export default function EmployerDashboard() {
     setSuccess('');
     try {
       const payload = {
-        ...companyForm,
-        socialLinks: companyForm.socialLinks || null,
+        name: companyForm.name,
+        description: companyForm.description,
+        website: companyForm.website,
+        logoUrl: companyForm.logoUrl,
       };
       if (editingCompanyId) {
         await api.put(`/companies/${editingCompanyId}`, payload);
@@ -268,12 +240,16 @@ export default function EmployerDashboard() {
     setSuccess('');
     try {
       const payload = {
-        ...jobForm,
+        title: jobForm.title,
+        description: jobForm.description,
+        requirements: jobForm.requirements,
+        location: jobForm.location,
+        employmentType: jobForm.employmentType,
+        salaryMin: jobForm.salaryMin ? Number(jobForm.salaryMin) : 0,
+        salaryMax: jobForm.salaryMax ? Number(jobForm.salaryMax) : 0,
+        deadline: jobForm.deadline || null,
         companyId: Number(jobForm.companyId),
         categoryId: Number(jobForm.categoryId),
-        salaryMin: jobForm.salaryMin ? Number(jobForm.salaryMin) : null,
-        salaryMax: jobForm.salaryMax ? Number(jobForm.salaryMax) : null,
-        deadline: jobForm.deadline || null,
       };
       if (editingJobId) {
         await api.put(`/jobs/${editingJobId}`, payload);
@@ -416,16 +392,32 @@ export default function EmployerDashboard() {
 
           {showCompanyForm && (
             <form onSubmit={handleCreateOrUpdateCompany} className="mt-5 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
-              <input required placeholder="Company name" value={companyForm.name} onChange={(e) => setCompanyForm({ ...companyForm, name: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <input placeholder="Website" value={companyForm.website} onChange={(e) => setCompanyForm({ ...companyForm, website: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input placeholder="Email" value={companyForm.email} onChange={(e) => setCompanyForm({ ...companyForm, email: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input placeholder="Phone" value={companyForm.phone} onChange={(e) => setCompanyForm({ ...companyForm, phone: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input placeholder="Location" value={companyForm.location} onChange={(e) => setCompanyForm({ ...companyForm, location: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input placeholder="Industry" value={companyForm.industry} onChange={(e) => setCompanyForm({ ...companyForm, industry: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input placeholder="Logo URL" value={companyForm.logoUrl} onChange={(e) => setCompanyForm({ ...companyForm, logoUrl: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input placeholder="Banner URL" value={companyForm.bannerUrl} onChange={(e) => setCompanyForm({ ...companyForm, bannerUrl: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <textarea placeholder="Short company description" rows={3} value={companyForm.description} onChange={(e) => setCompanyForm({ ...companyForm, description: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <input placeholder="Social links" value={companyForm.socialLinks} onChange={(e) => setCompanyForm({ ...companyForm, socialLinks: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
+              <input
+                required
+                placeholder="Company name"
+                value={companyForm.name}
+                onChange={(e) => setCompanyForm({ ...companyForm, name: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2"
+              />
+              <input
+                placeholder="Website"
+                value={companyForm.website}
+                onChange={(e) => setCompanyForm({ ...companyForm, website: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              />
+              <input
+                placeholder="Logo URL"
+                value={companyForm.logoUrl}
+                onChange={(e) => setCompanyForm({ ...companyForm, logoUrl: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              />
+              <textarea
+                placeholder="Short company description"
+                rows={3}
+                value={companyForm.description}
+                onChange={(e) => setCompanyForm({ ...companyForm, description: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2"
+              />
               <button type="submit" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 sm:col-span-2">
                 {editingCompanyId ? 'Save changes' : 'Create company'}
               </button>
@@ -475,38 +467,79 @@ export default function EmployerDashboard() {
 
           {showJobForm && (
             <form onSubmit={handleCreateOrUpdateJob} className="mt-5 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
-              <input required placeholder="Job title" value={jobForm.title} onChange={(e) => setJobForm({ ...jobForm, title: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <textarea required placeholder="Description" rows={3} value={jobForm.description} onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <textarea placeholder="Responsibilities" rows={3} value={jobForm.responsibilities} onChange={(e) => setJobForm({ ...jobForm, responsibilities: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <textarea placeholder="Requirements" rows={2} value={jobForm.requirements} onChange={(e) => setJobForm({ ...jobForm, requirements: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <textarea placeholder="Skills" rows={2} value={jobForm.skills} onChange={(e) => setJobForm({ ...jobForm, skills: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <textarea placeholder="Benefits" rows={2} value={jobForm.benefits} onChange={(e) => setJobForm({ ...jobForm, benefits: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2" />
-              <input required placeholder="Location" value={jobForm.location} onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <select value={jobForm.employmentType} onChange={(e) => setJobForm({ ...jobForm, employmentType: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400">
-                <option value="FULL_TIME">Full-time</option>
-                <option value="PART_TIME">Part-time</option>
-                <option value="CONTRACT">Contract</option>
-                <option value="INTERNSHIP">Internship</option>
-                <option value="REMOTE">Remote</option>
+              <input
+                required
+                placeholder="Job title"
+                value={jobForm.title}
+                onChange={(e) => setJobForm({ ...jobForm, title: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2"
+              />
+              <textarea
+                required
+                placeholder="Description"
+                rows={3}
+                value={jobForm.description}
+                onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2"
+              />
+              <textarea
+                placeholder="Requirements"
+                rows={2}
+                value={jobForm.requirements}
+                onChange={(e) => setJobForm({ ...jobForm, requirements: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 sm:col-span-2"
+              />
+              <input
+                required
+                placeholder="Location"
+                value={jobForm.location}
+                onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              />
+              <select
+                value={jobForm.employmentType}
+                onChange={(e) => setJobForm({ ...jobForm, employmentType: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              >
+                {EMPLOYMENT_TYPES.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
               </select>
-              <select value={jobForm.experienceLevel} onChange={(e) => setJobForm({ ...jobForm, experienceLevel: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400">
-                <option value="ENTRY">Entry</option>
-                <option value="MID">Mid</option>
-                <option value="SENIOR">Senior</option>
-              </select>
-              <select value={jobForm.remoteType} onChange={(e) => setJobForm({ ...jobForm, remoteType: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400">
-                <option value="ON_SITE">Onsite</option>
-                <option value="REMOTE">Remote</option>
-                <option value="HYBRID">Hybrid</option>
-              </select>
-              <input type="number" placeholder="Min salary" value={jobForm.salaryMin} onChange={(e) => setJobForm({ ...jobForm, salaryMin: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input type="number" placeholder="Max salary" value={jobForm.salaryMax} onChange={(e) => setJobForm({ ...jobForm, salaryMax: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <input type="date" value={jobForm.deadline} onChange={(e) => setJobForm({ ...jobForm, deadline: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400" />
-              <select required value={jobForm.companyId} onChange={(e) => setJobForm({ ...jobForm, companyId: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400">
+              <input
+                type="number"
+                placeholder="Min salary"
+                value={jobForm.salaryMin}
+                onChange={(e) => setJobForm({ ...jobForm, salaryMin: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              />
+              <input
+                type="number"
+                placeholder="Max salary"
+                value={jobForm.salaryMax}
+                onChange={(e) => setJobForm({ ...jobForm, salaryMax: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              />
+              <input
+                type="date"
+                value={jobForm.deadline}
+                onChange={(e) => setJobForm({ ...jobForm, deadline: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              />
+              <select
+                required
+                value={jobForm.companyId}
+                onChange={(e) => setJobForm({ ...jobForm, companyId: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              >
                 <option value="">Select company</option>
                 {companies.map((company) => <option key={company.id} value={company.id}>{company.name}</option>)}
               </select>
-              <select required value={jobForm.categoryId} onChange={(e) => setJobForm({ ...jobForm, categoryId: e.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400">
+              <select
+                required
+                value={jobForm.categoryId}
+                onChange={(e) => setJobForm({ ...jobForm, categoryId: e.target.value })}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+              >
                 <option value="">Select category</option>
                 {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
               </select>
