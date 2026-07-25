@@ -18,6 +18,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminCompanies from './pages/admin/AdminCompanies';
 import AdminJobs from './pages/admin/AdminJobs';
 import AdminApplications from './pages/admin/AdminApplications';
+import About from './pages/About';
 
 function NotFound() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
           <main>
             <Routes>
               <Route path="/" element={<JobBoard />} />
+              <Route path="/about" element={<About />} />
               <Route path="/jobs/:id" element={<JobDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

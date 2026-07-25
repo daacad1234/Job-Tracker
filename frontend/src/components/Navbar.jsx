@@ -26,6 +26,9 @@ export default function Navbar() {
           <Link to="/" className="rounded px-3 py-2 text-ink-soft hover:bg-ink/5 hover:text-ink">
             Jobs
           </Link>
+          <Link to="/about" className="rounded px-3 py-2 text-ink-soft hover:bg-ink/5 hover:text-ink">
+            About
+          </Link>
 
           {user?.role === 'APPLICANT' && (
             <>

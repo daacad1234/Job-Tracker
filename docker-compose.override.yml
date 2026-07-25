@@ -1,0 +1,9 @@
+services:
+  backend:
+    # The existing frontend calls http://localhost:8081/api. Keep the
+    # original 8080 mapping and expose Spring Boot's configured 8081 port too.
+    ports:
+      - "8081:8081"
+    environment:
+      # The production frontend is published at 5173; allow the Vite port too.
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:5174
