@@ -40,7 +40,7 @@ export default function Register() {
               value={form.fullName}
               onChange={(e) => setForm({ ...form, fullName: e.target.value })}
               className="w-full rounded-md border border-[var(--color-ink)]/15 px-3 py-2 outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
-              placeholder="Jane Doe"
+              placeholder="Enter your full name"
             />
           </div>
           <div>
